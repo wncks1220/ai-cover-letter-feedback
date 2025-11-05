@@ -299,5 +299,11 @@ app.listen(PORT, () => {
   console.log(`✅ 서버 실행 중: http://localhost:${PORT}`);
 });
 
+// ====== 기본 경로 리다이렉트 ======
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "login.html"));
+});
+
+
 
 
