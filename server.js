@@ -36,11 +36,15 @@ app.use(express.static(__dirname));
 console.log("Loaded key:", process.env.OPENAI_API_KEY ? "✅ OK" : "❌ 없음");
 
 // ====== MongoDB 연결 ======
+const MONGO_URI = process.env.MONGODB_URI;
+
+if (!MONGO_URI) {
+  console.error("❌ MONGODB_URI 환경변수가 없습니다. Render 환경 변수를 확인하세요.");
+  process.exit(1);
+}
+
 mongoose
-  .connect("mongodb://127.0.0.1:27017/myapp", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB 연결 성공"))
   .catch((err) => console.error("❌ MongoDB 연결 실패:", err));
 
@@ -294,5 +298,6 @@ app.post("/feedback/simple", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ 서버 실행 중: http://localhost:${PORT}`);
 });
+
 
 
