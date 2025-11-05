@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>자기소개서 피드백 (BERT ↔ GPT)</title>
+  <link rel="stylesheet" href="feedback.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">🧠 자기소개서 피드백</h1>
+      <button class="back-btn" onclick="goBack()">← 돌아가기</button>
+    </header>
+
+    <section class="card">
+      <label class="label">자기소개서 입력</label>
+      <textarea id="essayInput" class="textarea" placeholder="자기소개서를 붙여넣고 ‘BERT 분석’ 버튼을 눌러주세요."></textarea>
+      <div class="toolbar">
+        <button class="btn btn-primary" id="btnBert">BERT 분석</button>
+        <button class="btn btn-accent" id="btnGpt" disabled>GPT로 재작성</button>
+        <button class="btn btn-ghost" id="btnClear">지우기</button>
+      </div>
+    </section>
+
+    <section class="panes">
+      <div class="pane">
+        <h3>🔎 BERT 문장별 분석 결과</h3>
+        <div id="bertList" class="muted">분석 결과가 여기에 표시됩니다.</div>
+      </div>
+
+      <div class="pane">
+        <h3>✍️ GPT 재작성 결과</h3>
+        <div id="gptOut" class="gpt-output">
+        BERT 분석이 끝나면, 해당 결과를 바탕으로 GPT가 자연스러운 개선 문장을 생성합니다.
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="feedback.js"></script>
+</body>
+</html>

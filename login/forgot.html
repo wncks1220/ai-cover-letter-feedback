@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>비밀번호 변경 / 찾기</title>
+  <link rel="stylesheet" href="auth.css">
+  <style>
+    .container {
+      max-width: 400px;
+      margin: 100px auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      padding: 30px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      background-color: #4338ca;
+    }
+
+    .back {
+      background: transparent;
+      color: #4f46e5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>비밀번호 변경 / 찾기</h2>
+    <input type="text" id="username" placeholder="아이디 입력">
+    <input type="password" id="newPassword" placeholder="새 비밀번호 입력">
+    <button onclick="resetPassword()">비밀번호 변경</button>
+    <button class="back" onclick="location.href='login.html'">← 로그인으로 돌아가기</button>
+    <button class="back" onclick="history.back()">← 이전 화면으로 돌아가기</button>
+  </div>
+
+  <script>
+  async function resetPassword() {
+    const username = document.getElementById("username").value.trim();
+    const newPassword = document.getElementById("newPassword").value.trim();
+
+    if (!username || !newPassword) {
+      alert("아이디와 새 비밀번호를 모두 입력하세요.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, newPassword })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("비밀번호가 변경되었습니다. 로그인해주세요.");
+        window.location.href = "login.html";
+      } else {
+        alert(data.error || "변경 실패");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("서버 오류로 변경 실패");
+    }
+  }
+  </script>
+</body>
+</html>

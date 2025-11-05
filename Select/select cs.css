@@ -1,0 +1,66 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f7f7f8;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #202123;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.account-btn {
+  background: none;
+  border: 2px solid #10a37f;
+  color: #10a37f;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.account-btn:hover {
+  background-color: #10a37f;
+  color: white;
+}
+
+.container {
+  background: white;
+  padding: 100px 180px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 30px;
+  color: #0f0f0f;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin: 12px 0;
+  background: linear-gradient(to right, #10a37f, #1a73e8);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn:hover {
+  background: linear-gradient(to right, #0e8a6e, #125ecf);
+}
