@@ -14,7 +14,7 @@ async function signup() {
   }
 
   try {
-    const res = await fetch("http://localhost:3000/signup", {
+    const res = await fetch("signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
@@ -33,3 +33,4 @@ async function signup() {
     alert("서버 연결 실패");
   }
 }
+
