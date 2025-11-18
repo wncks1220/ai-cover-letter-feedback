@@ -93,7 +93,7 @@ btnBert.addEventListener('click', async () => {
     const res = await fetch(`${BERT_API}/feedback/bert`, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: essay })
+      body: JSON.stringify({ essay: essay })
     });
 
     if (!res.ok) throw new Error('BERT API 오류');
@@ -155,6 +155,7 @@ btnClear.addEventListener('click', () => {
   lastBertResult = null;
   btnGpt.disabled = true;
 });
+
 
 
 
