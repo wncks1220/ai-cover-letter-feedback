@@ -1,4 +1,5 @@
-const API = "https://ai-cover-letter-feedback.onrender.com";
+const API = "https://ai-cover-letter-feedback-production.up.railway.app";
+
 
 // 로그아웃 버튼 클릭 시
 document.getElementById('accountBtn').onclick = async function () {
@@ -30,3 +31,4 @@ document.getElementById('feedbackBtn').onclick = function () {
   location.href = '../feedback/feedback.html'; // 실제 피드백 페이지 경로로 변경
 
 };
+
