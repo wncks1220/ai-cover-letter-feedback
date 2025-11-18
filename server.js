@@ -120,12 +120,13 @@ app.post("/login", async (req, res) => {
   }
 });
 
+
 // ====== GPT 자기소개서 생성 ======
 app.post("/generate", authMiddleware, async (req, res) => {
   try {
     const { input } = req.body;
     const userId = req.user.id;
-    const username = req.user.username;  // ⭐ username 추가
+    const username = req.user.username; // 🔥 토큰에 있는 username 사용
 
     if (!input) {
       return res.status(400).json({ error: "입력값이 필요합니다." });
@@ -144,23 +145,24 @@ ${input}
       messages: [{ role: "user", content: prompt }],
     });
 
-    const generated = completion.choices[0].message.content;
+    const output = completion.choices[0].message.content;
 
-    // ⭐ 스키마에 맞춰 저장 (input, output, username)
+    // 🔥 스키마에 맞게 정확하게 저장
     await Essay.create({
       userId,
       username,
       input,
-      output: generated,
+      output,
       createdAt: new Date()
     });
 
-    res.json({ message: generated });
+    res.json({ message: output });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "자기소개서 생성 실패" });
   }
 });
+
 // ====== 자기소개서 히스토리 불러오기 ======
 app.get("/history", authMiddleware, async (req, res) => {
   try {
@@ -255,6 +257,7 @@ ${analysis.map((s, i) => `${i + 1}. ${s.sentence} (${s.comment})`).join("\n")}
 app.listen(PORT, () => {
   console.log(`🚀 서버 실행 중: 포트=${PORT}`);
 });
+
 
 
 
