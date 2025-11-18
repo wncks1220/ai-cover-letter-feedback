@@ -51,7 +51,8 @@
     <input type="text" id="username" placeholder="아이디 입력">
     <input type="password" id="newPassword" placeholder="새 비밀번호 입력">
     <button onclick="resetPassword()">비밀번호 변경</button>
-    <button class="back" onclick="location.href='login.html'">← 로그인으로 돌아가기</button>
+
+    <!-- 요청에 따라 로그인 화면으로 돌아가기 버튼 삭제 -->
     <button class="back" onclick="history.back()">← 이전 화면으로 돌아가기</button>
   </div>
 
@@ -66,7 +67,7 @@
     }
 
     try {
-      const res = await fetch("http://localhost:3000/reset-password", {
+      const res = await fetch("https://ai-cover-letter-feedback-production.up.railway.app/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, newPassword })
