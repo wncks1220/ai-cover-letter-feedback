@@ -5,7 +5,7 @@ async function generateEssay() {
 
   if (!token) {
     alert("로그인이 필요합니다.");
-    window.location.href = "../login/login.html";
+    window.location.href = "../login.html";
     return;
   }
 
@@ -15,7 +15,7 @@ async function generateEssay() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/generate", {
+    const response = await fetch("https://ai-cover-letter-feedback-production.up.railway.app/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -62,7 +62,7 @@ function toggleAccount() {
 
 // ====== 로그아웃 ======
 function logout() {
-  localStorage.removeItem("token"); // ✅ currentUser 대신 token 제거
+  localStorage.removeItem("token"); //  currentUser 대신 token 제거
   alert("로그아웃 완료");
   window.location.href = "../login.html";
 }
@@ -99,4 +99,5 @@ function displayCurrentUser() {
     userElement.textContent = "로그인 정보 오류";
   }
 }
+
 window.addEventListener("DOMContentLoaded", displayCurrentUser);
