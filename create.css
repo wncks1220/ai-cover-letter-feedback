@@ -1,0 +1,156 @@
+/* ===== 페이지 기본 ===== */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ===== 레이아웃: 좌측 사이드바 + 리사이저 + 우측 메인 ===== */
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* ===== 사이드바 ===== */
+.sidebar {
+  width: 260px;                    /* 드래그로 바뀌는 부분 */
+  background-color: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease;
+  position: relative;
+  z-index: 10;
+}
+.sidebar.hidden { transform: translateX(-260px); }
+
+.sidebar-header {
+  padding: 16px 18px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #4f46e5;
+  border-bottom: 1px solid #e5e7eb;
+}
+.history-list { flex: 1; overflow-y: auto; }
+.history-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+}
+.history-item:hover { background: #ececff; }
+
+/* 사이드바 세로 토글 버튼 (숨겨져도 화면 왼쪽에 남음) */
+.sidebar-toggle-btn {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(-100%, -50%);
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  width: 28px;
+  height: 120px;
+  cursor: pointer;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 14px;
+}
+.sidebar-toggle-btn:hover { background: #4338ca; }
+
+/* ===== 드래그 리사이저 ===== */
+.resizer {
+  width: 6px;
+  cursor: col-resize;
+  position: relative;
+  background: transparent;
+}
+.resizer::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: #e5e7eb;         /* 얇은 선 */
+  transition: background 0.2s;
+}
+.resizer:hover::after,
+body.resizing .resizer::after { background: #c7cbe1; }
+/* 사이드바가 숨겨졌을 때 리사이저를 화면 왼쪽 끝에 고정 */
+.resizer.at-edge { position: absolute; left: 0; }
+
+/* 드래그 중 텍스트 선택 방지 */
+body.resizing { user-select: none; }
+
+/* ===== 우측 메인 ===== */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+.header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8f9ff;
+}
+.home-btn, .account-btn {
+  background: #10b981; color: #fff; border: none; border-radius: 6px;
+  padding: 8px 12px; cursor: pointer;
+}
+.account-btn { background: #16a34a; }
+.home-btn:hover, .account-btn:hover { opacity: 0.9; }
+
+.output-container { flex: 1; overflow-y: auto; padding: 16px; }
+.output {
+  background: #f3f4f6; border-radius: 10px;
+  padding: 14px; margin-bottom: 10px; white-space: pre-line;
+}
+
+/* ===== 하단 입력 바 ===== */
+.input-bar { border-top: 1px solid #e5e7eb; padding: 10px; }
+textarea {
+  width: 100%; height: 110px; resize: none; padding: 10px;
+  border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;
+}
+.footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.char-count { font-size: 12px; color: #6b7280; }
+.send-btn {
+  background: #4f46e5; color: #fff; border: none; border-radius: 6px;
+  padding: 8px 16px; cursor: pointer;
+}
+.send-btn:hover { background: #4338ca; }
+
+/* ===== 계정 드롭다운 ===== */
+.dropdown {
+  display: none; position: absolute; top: 44px; right: 16px;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px;
+}
+.dropdown.show { display: block; }
+.dropdown a, .dropdown button {
+  display: block; margin: 6px 0; text-decoration: none; color: #374151;
+  background: transparent; border: none; cursor: pointer;
+}
+/* 드롭다운 폭/줄바꿈 보정 */
+.dropdown { 
+  min-width: 200px;           /* 폭 충분히 확보 */
+}
+
+.dropdown a,
+.dropdown button {
+  white-space: nowrap;         /* 한 줄로 */
+  display: block;
+  padding: 8px 10px;
+}
+
+#currentUser {
+  font-weight: 600;
+  color: #4f46e5;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 6px;
+}
