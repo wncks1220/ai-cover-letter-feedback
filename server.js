@@ -197,7 +197,7 @@ app.post("/feedback/bert", authMiddleware, async (req, res) => {
     if (!BERT_URL)
       return res.status(500).json({ error: "BERT 서버 URL 미설정" });
 
-    const bertRes = await fetch(`${BERT_URL}/analyze`, {
+    const bertRes = await fetch(BERT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ essay }),
@@ -257,6 +257,7 @@ ${analysis.map((s, i) => `${i + 1}. ${s.sentence} (${s.comment})`).join("\n")}
 app.listen(PORT, () => {
   console.log(`🚀 서버 실행 중: 포트=${PORT}`);
 });
+
 
 
 
