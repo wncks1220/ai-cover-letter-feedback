@@ -121,9 +121,10 @@ app.post("/login", async (req, res) => {
 });
 
 // ====== GPT 자기소개서 생성 ======
-app.post("/generate", async (req, res) => {
+app.post("/generate", authMiddleware, async (req, res) => {
   try {
     const { input } = req.body;
+    const userId = req.user.id;
 
     if (!input) {
       return res.status(400).json({ error: "입력값이 필요합니다." });
@@ -142,12 +143,23 @@ ${input}
       messages: [{ role: "user", content: prompt }],
     });
 
-    res.json({ message: completion.choices[0].message.content });
+    const generated = completion.choices[0].message.content;
+
+    // 🔥 DB 저장
+    await Essay.create({
+      userId,
+      text: generated,
+      preview: generated.slice(0, 20),
+      date: new Date()
+    });
+
+    res.json({ message: generated });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "자기소개서 생성 실패" });
   }
 });
+
 
 // ====== BERT 분석 ======
 app.post("/feedback/bert", authMiddleware, async (req, res) => {
@@ -218,6 +230,7 @@ ${analysis.map((s, i) => `${i + 1}. ${s.sentence} (${s.comment})`).join("\n")}
 app.listen(PORT, () => {
   console.log(`🚀 서버 실행 중: 포트=${PORT}`);
 });
+
 
 
 
