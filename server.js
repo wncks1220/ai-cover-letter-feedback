@@ -125,6 +125,7 @@ app.post("/generate", authMiddleware, async (req, res) => {
   try {
     const { input } = req.body;
     const userId = req.user.id;
+    const username = req.user.username;  // ⭐ username 추가
 
     if (!input) {
       return res.status(400).json({ error: "입력값이 필요합니다." });
@@ -145,12 +146,13 @@ ${input}
 
     const generated = completion.choices[0].message.content;
 
-    // 🔥 DB 저장
+    // ⭐ 스키마에 맞춰 저장 (input, output, username)
     await Essay.create({
       userId,
-      text: generated,
-      preview: generated.slice(0, 20),
-      date: new Date()
+      username,
+      input,
+      output: generated,
+      createdAt: new Date()
     });
 
     res.json({ message: generated });
@@ -164,7 +166,7 @@ app.get("/history", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const essays = await Essay.find({ userId }).sort({ date: -1 });
+    const essays = await Essay.find({ userId }).sort({ createdAt: -1 });
 
     res.json({ history: essays });
   } catch (err) {
@@ -253,6 +255,7 @@ ${analysis.map((s, i) => `${i + 1}. ${s.sentence} (${s.comment})`).join("\n")}
 app.listen(PORT, () => {
   console.log(`🚀 서버 실행 중: 포트=${PORT}`);
 });
+
 
 
 
