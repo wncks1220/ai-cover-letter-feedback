@@ -90,7 +90,7 @@ btnBert.addEventListener('click', async () => {
   btnGpt.disabled = true;
 
   try {
-    const res = await fetch(`${BERT_API}/analyze`, {
+    const res = await fetch(`${BERT_API}/feedback/bert`, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: essay })
@@ -155,6 +155,7 @@ btnClear.addEventListener('click', () => {
   lastBertResult = null;
   btnGpt.disabled = true;
 });
+
 
 
 
