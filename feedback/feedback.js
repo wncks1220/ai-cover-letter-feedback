@@ -99,8 +99,8 @@ btnBert.addEventListener('click', async () => {
     if (!res.ok) throw new Error('BERT API 오류');
     const data = await res.json();
 
-    lastBertResult = { feedback: data.result };
-    renderBert(data.result || []);
+    lastBertResult = { feedback: data.feedback };
+    renderBert(data.feedback || []);
     btnGpt.disabled = false;
 
   } catch (e) {
@@ -155,6 +155,7 @@ btnClear.addEventListener('click', () => {
   lastBertResult = null;
   btnGpt.disabled = true;
 });
+
 
 
 
