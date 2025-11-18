@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>자기소개서 생성</title>
+  <link rel="stylesheet" href="create.css" />
+</head>
+<body>
+  <div class="layout" id="layout">
+    <!-- ===== 왼쪽 사이드바 ===== -->
+    <div class="sidebar" id="sidebar">
+      <button class="sidebar-toggle-btn" onclick="toggleSidebar()">📜 내역</button>
+      <div class="sidebar-header">📜 내 활동 내역</div>
+      <div id="historyList" class="history-list">불러오는 중...</div>
+    </div>
+
+    <!-- 리사이저 -->
+    <div class="resizer" id="resizer" title="드래그해서 너비 조절"></div>
+
+    <!-- ===== 오른쪽 메인 ===== -->
+    <div class="main" id="main">
+      <div class="header">
+        <div class="left-controls">
+          <button class="home-btn" onclick="goToSelect()">🏠 선택화면으로</button>
+        </div>
+        <div class="right-controls" style="position: relative;">
+          <button class="account-btn" onclick="toggleAccount()">내 계정</button>
+          <div id="accountDropdown" class="dropdown">
+            <p id="currentUser"></p>
+            <a href="../login/forgot.html">⚙️ 비밀번호 변경/찾기</a>
+            <button onclick="logout()">🚪 로그아웃</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="output-container" id="outputContainer">
+        <div class="output">GPT 생성 화면입니다.</div>
+      </div>
+
+      <div class="input-bar">
+        <textarea id="userInput" placeholder="키워드 또는 경험을 입력하세요..." oninput="updateCharCount()"></textarea>
+        <div class="footer">
+          <span class="char-count" id="charCount">0자</span>
+          <button class="send-btn" onclick="generateEssay()">생성하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 기존 기능들 -->
+  <script src="create.js"></script>
+
+  <!-- 리사이저/히스토리/토글 스크립트 -->
+  <script>
+    // ===== 계정 드롭다운 닫힘 처리 (바깥 클릭) =====
+    window.addEventListener("click", (e) => {
+      const btn = e.target.closest(".account-btn");
+      const dd  = document.getElementById("accountDropdown");
+      if (!btn && dd && dd.classList.contains("show")) dd.classList.remove("show");
+    });
+
+    // ===== 사이드바 토글 (숨김 상태 저장) =====
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const resizer = document.getElementById('resizer');
+      sidebar.classList.toggle('hidden');
+      resizer.classList.toggle('at-edge', sidebar.classList.contains('hidden'));
+      localStorage.setItem('sidebarHidden', sidebar.classList.contains('hidden') ? '1' : '0');
+    }
+
+    // ===== 히스토리 로드 =====
+    async function loadHistory() {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const res = await fetch('http://localhost:3000/history', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const list = document.getElementById('historyList');
+        list.innerHTML = '';
+
+        if (!data.length) {
+          list.innerHTML = '<p style="padding:15px;">히스토리가 없습니다.</p>';
+          return;
+        }
+
+        data.forEach((item, i) => {
+          const div = document.createElement('div');
+          div.className = 'history-item';
+          const preview = (item.output || '').replace(/\s+/g,' ').slice(0, 20);
+          div.textContent = `${i + 1}. ${new Date(item.createdAt).toLocaleString()} · ${preview}`;
+          div.onclick = () => {
+            const container = document.getElementById('outputContainer');
+            const newOutput = document.createElement('div');
+            newOutput.className = 'output';
+            newOutput.textContent = item.output || '';
+            container.prepend(newOutput);
+          };
+          list.appendChild(div);
+        });
+      } catch (err) {
+        console.error('히스토리 로드 오류:', err);
+      }
+    }
+
+    // ===== 리사이저 세팅 (폭 드래그 + 저장/복원) =====
+    (function setupResizer(){
+      const sidebar = document.getElementById('sidebar');
+      const resizer = document.getElementById('resizer');
+
+      // 저장된 상태 복원
+      const savedWidth  = localStorage.getItem('sidebarWidth');
+      const savedHidden = localStorage.getItem('sidebarHidden') === '1';
+      if (savedWidth) sidebar.style.width = savedWidth;
+      if (savedHidden) {
+        sidebar.classList.add('hidden');
+        resizer.classList.add('at-edge');
+      }
+
+      let isDragging = false;
+      const MIN = 180, MAX = 500;
+
+      const onMouseDown = (e) => {
+        if (sidebar.classList.contains('hidden')) return; // 숨김 상태에선 드래그 X
+        isDragging = true;
+        document.body.classList.add('resizing');
+        e.preventDefault();
+      };
+
+      const onMouseMove = (e) => {
+        if (!isDragging) return;
+        let newW = Math.max(MIN, Math.min(MAX, e.clientX)); // 화면 왼쪽 기준 X
+        sidebar.style.width = newW + 'px';
+      };
+
+      const onMouseUp = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        document.body.classList.remove('resizing');
+        localStorage.setItem('sidebarWidth', getComputedStyle(sidebar).width);
+      };
+
+      resizer.addEventListener('mousedown', onMouseDown);
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+
+      // 더블클릭: 열고/닫기, Shift+더블클릭: 기본폭 복원
+      resizer.addEventListener('dblclick', (e) => {
+        if (e.shiftKey) {
+          sidebar.classList.remove('hidden');
+          resizer.classList.remove('at-edge');
+          sidebar.style.width = '260px';
+          localStorage.setItem('sidebarWidth', '260px');
+          localStorage.setItem('sidebarHidden', '0');
+        } else {
+          toggleSidebar();
+        }
+      });
+    })();
+
+    // 초기 로드
+    loadHistory();
+  </script>
+</body>
+</html>
