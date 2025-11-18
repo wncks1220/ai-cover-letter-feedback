@@ -70,6 +70,7 @@ function authMiddleware(req, res, next) {
   }
 }
 
+
 // ====== 회원가입 ======
 app.post("/signup", async (req, res) => {
   try {
@@ -116,6 +117,35 @@ app.post("/login", async (req, res) => {
     res.json({ token });
   } catch (err) {
     res.status(500).json({ error: "로그인 실패" });
+  }
+});
+
+// ====== GPT 자기소개서 생성 ======
+app.post("/generate", async (req, res) => {
+  try {
+    const { input } = req.body;
+
+    if (!input) {
+      return res.status(400).json({ error: "입력값이 필요합니다." });
+    }
+
+    const prompt = `
+당신은 채용 담당자입니다.
+아래 내용을 기반으로 자연스럽고 완성도 높은 자기소개서를 작성해주세요.
+
+입력 내용:
+${input}
+`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    res.json({ message: completion.choices[0].message.content });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "자기소개서 생성 실패" });
   }
 });
 
@@ -188,6 +218,7 @@ ${analysis.map((s, i) => `${i + 1}. ${s.sentence} (${s.comment})`).join("\n")}
 app.listen(PORT, () => {
   console.log(`🚀 서버 실행 중: 포트=${PORT}`);
 });
+
 
 
 
