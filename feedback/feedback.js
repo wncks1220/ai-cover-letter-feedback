@@ -5,6 +5,7 @@ const gptOut   = document.getElementById('gptOut');
 const btnBert  = document.getElementById('btnBert');
 const btnGpt   = document.getElementById('btnGpt');
 const btnClear = document.getElementById('btnClear');
+const API = "https://ai-cover-letter-feedback.onrender.com";
 
 let lastBertResult = null; // { feedback: [{ sentence, label, score, comment }, ...] }
 
@@ -64,7 +65,7 @@ btnBert.addEventListener('click', async () => {
 
   try {
     // 백엔드: POST /feedback/bert → { feedback: [...] }
-    const res = await fetch('http://localhost:3000/feedback/bert', {
+    const res = await fetch(`${API}/feedback/bert`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify({ essay })
@@ -91,7 +92,7 @@ btnGpt.addEventListener('click', async () => {
 
   try {
     // 백엔드: POST /feedback/gpt → { rewritten, sentences? }
-    const res = await fetch('http://localhost:3000/feedback/gpt', {
+    const res = await fetch(`${API}/feedback/gpt`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify({ essay, analysis: lastBertResult.feedback })
@@ -121,3 +122,4 @@ btnClear.addEventListener('click', () => {
   lastBertResult = null;
   btnGpt.disabled = true;
 });
+
