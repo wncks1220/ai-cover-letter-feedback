@@ -61,27 +61,33 @@ btnBert.addEventListener('click', async () => {
   if (!essay) return alert('내용을 입력해주세요.');
 
   bertList.innerHTML = '<span class="loader"></span> BERT가 문장별로 분석 중입니다…';
-  gptOut.textContent = 'BERT 분석이 끝나면, 해당 결과를 바탕으로 GPT가 자연스러운 개선 문장을 생성합니다.';
+  gptOut.textContent = 'BERT 분석이 끝나면 GPT가 문장을 개선합니다.';
   btnGpt.disabled = true;
 
   try {
-    // 백엔드: POST /feedback/bert → { feedback: [...] }
+    const BERT_API = "https://ai-bert-feedback-server-production.up.railway.app";
+
     const res = await fetch(`${BERT_API}/analyze`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      body: JSON.stringify({ essay })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: essay })
     });
+
     if (!res.ok) throw new Error('BERT API 오류');
     const data = await res.json();
 
-    lastBertResult = data; // { feedback: [...] }
-    renderBert(data.feedback || []);
+    // BERT 서버에서 반환하는 형태 → { result: [...] }
+    lastBertResult = { feedback: data.result };
+
+    renderBert(data.result || []);
     btnGpt.disabled = false;
+
   } catch (e) {
     console.error(e);
     bertList.innerHTML = '<span class="muted">BERT 분석을 가져오지 못했습니다. 서버 상태를 확인하세요.</span>';
   }
 });
+
 
 /* ---------------- GPT 재작성 ---------------- */
 btnGpt.addEventListener('click', async () => {
@@ -123,6 +129,7 @@ btnClear.addEventListener('click', () => {
   lastBertResult = null;
   btnGpt.disabled = true;
 });
+
 
 
 
