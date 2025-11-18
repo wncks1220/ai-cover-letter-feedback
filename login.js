@@ -1,3 +1,5 @@
+const API = "https://ai-cover-letter-feedback.onrender.com";
+
 async function login() {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
@@ -8,7 +10,7 @@ async function login() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/login", {
+    const response = await fetch(`${API}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,4 +32,5 @@ async function login() {
     console.error("로그인 오류:", error);
     alert("서버와 연결할 수 없습니다.");
   }
+
 }
