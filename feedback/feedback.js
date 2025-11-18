@@ -38,22 +38,34 @@ function renderBert(items) {
 
   const frag = document.createDocumentFragment();
   items.forEach((it, idx) => {
+
+    // ⭐ label이 없으면 점수로 자동생성
+    const label = it.label ?? (
+      it.score > 0.8 ? "4 stars" :
+      it.score > 0.6 ? "3 stars" :
+      it.score > 0.4 ? "2 stars" :
+                       "1 star"
+    );
+
+    const comment = it.feedback ?? it.comment ?? "";
+
     const wrap = document.createElement('div');
     wrap.className = 'sentence-item';
     wrap.innerHTML = `
       <div class="sentence-text"><strong>${idx + 1}.</strong> ${escapeHtml(it.sentence)}</div>
       <div class="badge-row">
-        <span class="${badgeClassFromLabel(it.label)}">${escapeHtml(it.label)}</span>
+        <span class="${badgeClassFromLabel(label)}">${escapeHtml(label)}</span>
         <span class="badge">확신도: ${(it.score ?? 0).toFixed(2)}</span>
       </div>
       <div class="meter"><span style="width:${scoreToPercent(it.score)}%"></span></div>
-      <div class="comment">${escapeHtml(it.comment || '')}</div>
+      <div class="comment">${escapeHtml(comment)}</div>
     `;
     frag.appendChild(wrap);
   });
   bertList.innerHTML = '';
   bertList.appendChild(frag);
 }
+
 
 /* ---------------- BERT 분석 ---------------- */
 btnBert.addEventListener('click', async () => {
@@ -129,6 +141,7 @@ btnClear.addEventListener('click', () => {
   lastBertResult = null;
   btnGpt.disabled = true;
 });
+
 
 
 
