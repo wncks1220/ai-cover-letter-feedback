@@ -1,4 +1,5 @@
-const API = "https://ai-cover-letter-feedback.onrender.com";
+const API = "https://ai-cover-letter-feedback-production.up.railway.app";
+
 
 async function login() {
   const username = document.getElementById('username').value.trim();
@@ -34,3 +35,4 @@ async function login() {
   }
 
 }
+
