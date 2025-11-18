@@ -7,6 +7,7 @@
 </head>
 <body>
   <div class="layout" id="layout">
+
     <!-- ===== 왼쪽 사이드바 ===== -->
     <div class="sidebar" id="sidebar">
       <button class="sidebar-toggle-btn" onclick="toggleSidebar()">📜 내역</button>
@@ -23,6 +24,7 @@
         <div class="left-controls">
           <button class="home-btn" onclick="goToSelect()">🏠 선택화면으로</button>
         </div>
+
         <div class="right-controls" style="position: relative;">
           <button class="account-btn" onclick="toggleAccount()">내 계정</button>
           <div id="accountDropdown" class="dropdown">
@@ -44,22 +46,26 @@
           <button class="send-btn" onclick="generateEssay()">생성하기</button>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- 기존 기능들 -->
+  <!-- 기존 JS -->
   <script src="create.js"></script>
 
-  <!-- 리사이저/히스토리/토글 스크립트 -->
+  <!-- 리사이저/히스토리 로직 -->
   <script>
-    // ===== 계정 드롭다운 닫힘 처리 (바깥 클릭) =====
+    const API = "https://ai-cover-letter-feedback-production.up.railway.app";
+
+    // ===========================
+    // 계정 드롭다운 닫기
+    // ===========================
     window.addEventListener("click", (e) => {
       const btn = e.target.closest(".account-btn");
       const dd  = document.getElementById("accountDropdown");
       if (!btn && dd && dd.classList.contains("show")) dd.classList.remove("show");
     });
 
-    // ===== 사이드바 토글 (숨김 상태 저장) =====
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const resizer = document.getElementById('resizer');
@@ -68,28 +74,36 @@
       localStorage.setItem('sidebarHidden', sidebar.classList.contains('hidden') ? '1' : '0');
     }
 
-    // ===== 히스토리 로드 =====
+    // ===========================
+    // 히스토리 로드
+    // ===========================
     async function loadHistory() {
       const token = localStorage.getItem('token');
       if (!token) return;
+
       try {
-        const res = await fetch('http://localhost:3000/history', {
+        const res = await fetch(`${API}/history`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+
         const data = await res.json();
+        const history = data.history || [];
         const list = document.getElementById('historyList');
+
         list.innerHTML = '';
 
-        if (!data.length) {
+        if (history.length === 0) {
           list.innerHTML = '<p style="padding:15px;">히스토리가 없습니다.</p>';
           return;
         }
 
-        data.forEach((item, i) => {
+        history.forEach((item, i) => {
           const div = document.createElement('div');
           div.className = 'history-item';
-          const preview = (item.output || '').replace(/\s+/g,' ').slice(0, 20);
+          const preview = (item.output || '').replace(/\s+/g, ' ').slice(0, 20);
+
           div.textContent = `${i + 1}. ${new Date(item.createdAt).toLocaleString()} · ${preview}`;
+          
           div.onclick = () => {
             const container = document.getElementById('outputContainer');
             const newOutput = document.createElement('div');
@@ -97,19 +111,22 @@
             newOutput.textContent = item.output || '';
             container.prepend(newOutput);
           };
+
           list.appendChild(div);
         });
+
       } catch (err) {
-        console.error('히스토리 로드 오류:', err);
+        console.error("히스토리 로드 오류:", err);
       }
     }
 
-    // ===== 리사이저 세팅 (폭 드래그 + 저장/복원) =====
-    (function setupResizer(){
+    // ===========================
+    // 리사이저 로직
+    // ===========================
+    (function setupResizer() {
       const sidebar = document.getElementById('sidebar');
       const resizer = document.getElementById('resizer');
 
-      // 저장된 상태 복원
       const savedWidth  = localStorage.getItem('sidebarWidth');
       const savedHidden = localStorage.getItem('sidebarHidden') === '1';
       if (savedWidth) sidebar.style.width = savedWidth;
@@ -118,34 +135,29 @@
         resizer.classList.add('at-edge');
       }
 
-      let isDragging = false;
+      let dragging = false;
       const MIN = 180, MAX = 500;
 
-      const onMouseDown = (e) => {
-        if (sidebar.classList.contains('hidden')) return; // 숨김 상태에선 드래그 X
-        isDragging = true;
+      resizer.addEventListener('mousedown', (e) => {
+        if (sidebar.classList.contains('hidden')) return;
+        dragging = true;
         document.body.classList.add('resizing');
         e.preventDefault();
-      };
+      });
 
-      const onMouseMove = (e) => {
-        if (!isDragging) return;
-        let newW = Math.max(MIN, Math.min(MAX, e.clientX)); // 화면 왼쪽 기준 X
-        sidebar.style.width = newW + 'px';
-      };
+      window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        let newW = Math.max(MIN, Math.min(MAX, e.clientX));
+        sidebar.style.width = `${newW}px`;
+      });
 
-      const onMouseUp = () => {
-        if (!isDragging) return;
-        isDragging = false;
+      window.addEventListener('mouseup', () => {
+        if (!dragging) return;
+        dragging = false;
         document.body.classList.remove('resizing');
         localStorage.setItem('sidebarWidth', getComputedStyle(sidebar).width);
-      };
+      });
 
-      resizer.addEventListener('mousedown', onMouseDown);
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
-
-      // 더블클릭: 열고/닫기, Shift+더블클릭: 기본폭 복원
       resizer.addEventListener('dblclick', (e) => {
         if (e.shiftKey) {
           sidebar.classList.remove('hidden');
@@ -159,8 +171,10 @@
       });
     })();
 
-    // 초기 로드
+    // 초기 히스토리 로드
     loadHistory();
   </script>
 </body>
 </html>
+
+
