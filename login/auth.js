@@ -1,3 +1,4 @@
+const API = "https://ai-cover-letter-feedback.onrender.com";
 // 회원가입
 async function signup() {
   const username = document.getElementById('newUsername').value.trim();
@@ -9,7 +10,7 @@ async function signup() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/signup", {
+    const response = await fetch(`${API}/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -42,7 +43,7 @@ async function login() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/login", {
+    const response = await fetch(`${API}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -74,7 +75,7 @@ async function findPassword() {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/find-password", {
+    const response = await fetch(`${API}/find-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -94,3 +95,4 @@ async function findPassword() {
     document.getElementById('result').innerText = "서버 연결 실패";
   }
 }
+
