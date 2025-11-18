@@ -1,4 +1,5 @@
-const API = "https://ai-cover-letter-feedback.onrender.com";
+const API = "https://ai-cover-letter-feedback-production.up.railway.app";
+
 // 회원가입
 async function signup() {
   const username = document.getElementById('newUsername').value.trim();
@@ -95,4 +96,5 @@ async function findPassword() {
     document.getElementById('result').innerText = "서버 연결 실패";
   }
 }
+
 
