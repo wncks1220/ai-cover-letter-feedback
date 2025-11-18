@@ -1,1 +1,5 @@
-
+transformers==4.36.2
+torch
+flask
+flask-cors
+nltk
