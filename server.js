@@ -1,4 +1,4 @@
-// ====== 상단 설정 ======
+// ====== 기본 설정 ======
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -9,37 +9,30 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const OpenAI = require("openai");
 
+// 모델
+const User = require(path.join(__dirname, "models", "User.js"));
+const Essay = require(path.join(__dirname, "models", "Essay.js"));
 const { Feedback } = require("./models/FB");
 
-// Node18+ fetch
+// Node18+ fetch 대응
 if (typeof fetch !== "function") {
   global.fetch = (...args) =>
     import("node-fetch").then(({ default: f }) => f(...args));
 }
 
-// 모델
-const User = require(path.join(__dirname, "models", "User.js"));
-const Essay = require(path.join(__dirname, "models", "Essay.js"));
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ====== 필수 설정값 ======
+// ====== 환경 변수 ======
 const API_KEY = process.env.OPENAI_API_KEY;
 const SECRET_KEY = process.env.JWT_SECRET || "my-secret";
-const BERT_URL = process.env.BERT_SERVER_URL; 
-// ⚠ Railway에서 나중에 Variables에 BERT_SERVER_URL 추가
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static(__dirname));
+const BERT_URL = process.env.BERT_SERVER_URL;
+const MONGO_URI = process.env.MONGODB_URI;
 
 console.log("Loaded OpenAI Key:", API_KEY ? "OK" : "MISSING");
 console.log("Loaded BERT URL:", BERT_URL || "NOT SET");
 
 // ====== MongoDB 연결 ======
-const MONGO_URI = process.env.MONGODB_URI;
-
 if (!MONGO_URI) {
   console.error("❌ MONGODB_URI 없음");
   process.exit(1);
@@ -50,12 +43,24 @@ mongoose
   .then(() => console.log("✅ MongoDB 연결 성공"))
   .catch((err) => console.error("❌ MongoDB 실패:", err));
 
+app.use(cors());
+app.use(bodyParser.json());
+
+// ====== 정적 파일 제공 ======
+// login.html, login.js, login.css가 모두 루트에 있으므로 __dirname 그대로 제공
+app.use(express.static(__dirname));
+
+// 기본 페이지 → login.html
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "login.html"));
+});
+
 // ====== JWT 인증 ======
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: "토큰 없음" });
-  const token = authHeader.split(" ")[1];
 
+  const token = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
     req.user = decoded;
@@ -115,7 +120,7 @@ app.post("/login", async (req, res) => {
 });
 
 // ====== BERT 분석 ======
-app.post("/feedback/bert", async (req, res) => {
+app.post("/feedback/bert", authMiddleware, async (req, res) => {
   try {
     const { essay } = req.body;
     const userId = req.user?.id ?? null;
@@ -183,14 +188,6 @@ ${analysis.map((s, i) => `${i + 1}. ${s.sentence} (${s.comment})`).join("\n")}
 app.listen(PORT, () => {
   console.log(`🚀 서버 실행 중: 포트=${PORT}`);
 });
-
-// ====== 기본 HTML ======
-
-app.use(express.static(path.join(__dirname)));
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "login.html"));
-});
-
 
 
 
