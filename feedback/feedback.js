@@ -6,6 +6,7 @@ const btnBert  = document.getElementById('btnBert');
 const btnGpt   = document.getElementById('btnGpt');
 const btnClear = document.getElementById('btnClear');
 const API = "https://ai-cover-letter-feedback-production.up.railway.app";
+const BERT_API = "https://ai-bert-feedback-server-production.up.railway.app";
 
 let lastBertResult = null; // { feedback: [{ sentence, label, score, comment }, ...] }
 
@@ -122,5 +123,6 @@ btnClear.addEventListener('click', () => {
   lastBertResult = null;
   btnGpt.disabled = true;
 });
+
 
 
