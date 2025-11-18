@@ -159,8 +159,31 @@ ${input}
     res.status(500).json({ error: "자기소개서 생성 실패" });
   }
 });
+// ====== 자기소개서 히스토리 불러오기 ======
+app.get("/history", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
 
+    const essays = await Essay.find({ userId }).sort({ date: -1 });
 
+    res.json({ history: essays });
+  } catch (err) {
+    res.status(500).json({ error: "히스토리를 가져오지 못했습니다." });
+  }
+});
+// ====== 히스토리 삭제 ======
+app.delete("/history/:id", authMiddleware, async (req, res) => {
+  try {
+    const essay = await Essay.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+    if (!essay) return res.status(404).json({ error: "삭제할 항목을 찾을 수 없습니다." });
+    res.json({ message: "삭제 완료" });
+  } catch (err) {
+    res.status(500).json({ error: "삭제 실패" });
+  }
+});
 // ====== BERT 분석 ======
 app.post("/feedback/bert", authMiddleware, async (req, res) => {
   try {
@@ -230,6 +253,7 @@ ${analysis.map((s, i) => `${i + 1}. ${s.sentence} (${s.comment})`).join("\n")}
 app.listen(PORT, () => {
   console.log(`🚀 서버 실행 중: 포트=${PORT}`);
 });
+
 
 
 
